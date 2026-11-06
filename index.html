@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101b2d"><meta name="description" content="Ton assistant personnel pour gérer ton budget en FCFA.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+<title>Mon Budget — Personnel</title>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="#"><span class="brand-mark">₣</span><span>Mon Budget</span></a><div class="top-actions"><span id="monthLabel" class="month-label"></span><button class="icon-btn" id="installBtn" hidden title="Installer">⇩</button><button class="icon-btn" id="exportBtn" title="Exporter">↥</button></div></header>
+<main class="shell">
+<section class="hero"><div><p class="eyebrow">TON ASSISTANT FINANCIER</p><h1>Ton argent, <span>en clair.</span></h1><p class="muted">Une vue simple de tes revenus, dépenses et provisions.</p></div><button class="primary-btn" id="addTransactionTop">＋ Nouvelle opération</button></section>
+<section class="summary-grid">
+<article class="summary-card balance-card"><div class="card-heading"><span>Disponible après provisions</span><span class="pill live">● En direct</span></div><div class="big-number" id="available">0 FCFA</div><div class="balance-foot" id="balanceNote">Solde des comptes moins provisions cumulées</div></article>
+<article class="summary-card"><div class="card-heading"><span>Revenus du mois</span><span class="metric-icon income">↗</span></div><div class="metric-number" id="incomeTotal">0 FCFA</div><p class="muted small">Toutes sources confondues</p></article>
+<article class="summary-card"><div class="card-heading"><span>Dépenses du mois</span><span class="metric-icon expense">↘</span></div><div class="metric-number" id="expenseTotal">0 FCFA</div><p class="muted small" id="expenseSub">0 opération</p></article>
+<article class="summary-card"><div class="card-heading"><span>Provisions du mois</span><span class="metric-icon reserve">◷</span></div><div class="metric-number" id="reserveTotal">0 FCFA</div><p class="muted small">Argent réservé</p></article>
+</section>
+<div id="alerts" class="alerts" aria-live="polite"></div>
+<section class="panel accounts-panel"><div class="section-head"><div><p class="eyebrow">MES PORTEFEUILLES</p><h2>Où se trouve mon argent ?</h2></div><button class="text-btn" id="manageAccountsBtn">Gérer les comptes</button></div><div id="accounts" class="accounts-grid"></div><p class="muted small account-tip">Les transferts entre tes comptes ne sont pas comptés comme des revenus ni comme des dépenses.</p></section>
+<section class="content-grid">
+<div class="main-column">
+<section class="panel"><div class="section-head"><div><p class="eyebrow">PLANIFICATION</p><h2>Budget du mois</h2></div><button class="text-btn" id="editBudgetBtn">＋ Définir</button></div><p class="muted small">Compare tes dépenses réelles à tes enveloppes.</p><div id="budgetList" class="budget-list"></div></section>
+<section class="panel"><div class="section-head"><div><p class="eyebrow">SUIVI QUOTIDIEN</p><h2>Dernières opérations</h2></div><button class="text-btn" id="viewAllBtn">Voir tout</button></div><div id="transactions" class="transaction-list"></div></section>
+</div>
+<aside class="side-column">
+<section class="panel"><div class="section-head"><div><p class="eyebrow">RÉPARTITION</p><h2>Où va ton argent ?</h2></div></div><div class="chart-wrap"><canvas id="expenseChart" aria-label="Répartition des dépenses"></canvas><div id="chartEmpty" class="chart-empty">Ajoute des dépenses pour voir la répartition.</div></div><div id="chartLegend" class="legend"></div></section>
+<section class="panel"><div class="section-head"><div><p class="eyebrow">CAP SUR DEMAIN</p><h2>Objectifs d’épargne</h2></div><button class="text-btn" id="addGoalBtn">＋ Ajouter</button></div><div id="goals" class="goals-list"></div></section>
+</aside></section>
+<footer>Version personnelle · Données enregistrées sur cet appareil · Exporte régulièrement une sauvegarde.</footer>
+</main>
+<nav class="mobile-nav"><a href="#" class="active">⌂<span>Accueil</span></a><button id="mobileAdd">＋<span>Opération</span></button><button id="mobileBudget">▤<span>Budget</span></button><button id="mobileGoals">◎<span>Épargne</span></button></nav>
+
+<dialog id="transactionDialog" class="modal"><form id="transactionForm">
+<div class="modal-head"><div><p class="eyebrow">MOUVEMENT D’ARGENT</p><h2>Nouvelle opération</h2></div><button type="button" class="close-btn" data-close>×</button></div>
+<div class="type-switch"><label><input type="radio" name="type" value="expense" checked><span>Dépense</span></label><label><input type="radio" name="type" value="income"><span>Revenu</span></label><label><input type="radio" name="type" value="reserve"><span>Provision</span></label><label><input type="radio" name="type" value="transfer"><span>Transfert</span></label></div>
+<label>Libellé<input name="label" required maxlength="70" placeholder="Ex. Courses du marché"></label>
+<div class="form-row"><label>Montant (FCFA)<input name="amount" type="number" min="1" step="1" required placeholder="25000"></label><label>Date<input name="date" type="date" required></label></div>
+<div id="singleAccountFields"><label>Compte concerné<select name="accountId" id="accountSelect"></select></label><label>Catégorie<select name="category" id="transactionCategory"></select></label></div>
+<div id="transferFields" hidden><label>Compte de départ<select name="fromAccountId" id="fromAccount"></select></label><label>Compte d’arrivée<select name="toAccountId" id="toAccount"></select></label></div>
+<label>Note<input name="note" maxlength="100" placeholder="Facultatif"></label>
+<div class="modal-actions"><button type="button" class="secondary-btn" data-close>Annuler</button><button class="primary-btn" type="submit">Enregistrer</button></div>
+</form></dialog>
+
+<dialog id="accountsDialog" class="modal"><form id="accountsForm">
+<div class="modal-head"><div><p class="eyebrow">PORTEFEUILLES</p><h2>Mes comptes</h2></div><button type="button" class="close-btn" data-close>×</button></div>
+<p class="muted small">Renseigne le solde que tu possèdes actuellement dans chaque compte au démarrage. Ce montant sert de base au calcul.</p>
+<div id="accountFields" class="account-fields"></div>
+<div class="modal-actions"><button type="button" class="secondary-btn" data-close>Annuler</button><button class="primary-btn" type="submit">Enregistrer les soldes</button></div>
+</form></dialog>
+
+<dialog id="budgetDialog" class="modal"><form id="budgetForm"><div class="modal-head"><div><p class="eyebrow">PLANIFICATION MENSUELLE</p><h2>Prévoir mes dépenses</h2></div><button type="button" class="close-btn" data-close>×</button></div><p class="muted small">Définis une enveloppe pour chaque poste.</p><div id="budgetFields" class="budget-fields"></div><div class="modal-actions"><button type="button" class="secondary-btn" data-close>Annuler</button><button class="primary-btn" type="submit">Enregistrer le budget</button></div></form></dialog>
+<dialog id="goalDialog" class="modal"><form id="goalForm"><div class="modal-head"><div><p class="eyebrow">ÉPARGNE</p><h2>Nouvel objectif</h2></div><button type="button" class="close-btn" data-close>×</button></div><label>Nom de l’objectif<input name="name" required maxlength="50" placeholder="Ex. Fonds d’urgence"></label><div class="form-row"><label>Montant cible<input name="target" type="number" min="1" required></label><label>Déjà épargné<input name="saved" type="number" min="0" value="0"></label></div><label>Échéance<input name="deadline" type="date"></label><div class="modal-actions"><button type="button" class="secondary-btn" data-close>Annuler</button><button class="primary-btn" type="submit">Créer l’objectif</button></div></form></dialog>
+<dialog id="historyDialog" class="modal wide-modal"><div class="modal-head"><div><p class="eyebrow">HISTORIQUE</p><h2>Toutes les opérations du mois</h2></div><button type="button" class="close-btn" data-close>×</button></div><div id="allTransactions" class="transaction-list"></div></dialog>
+<script src="app.js"></script>
+</body></html>
